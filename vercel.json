@@ -10,28 +10,25 @@
         },
         {
             "src": "frontend/package.json",
-            "use": "@vercel/static-build"
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "frontend/build"
+            }
         }
     ],
     "routes": [
         {
-            "src": "/api/(.*)",
+            "src": "/api/:path*",
             "dest": "backend/app/main.py",
             "continue": true
         },
         {
-            "src": "/(.*\\.(js|css|png|jpg|svg|html))",
-            "dest": "/$1"
+            "src": "/:file*\\.(js|css|png|jpg|svg|html)$",
+            "dest": "frontend/build/$file"
         },
         {
-            "src": "/",
-            "dest": "/index.html"
-        }
-    ],
-    "rewrites": [
-        {
-            "source": "/api/(.*)",
-            "destination": "backend/app/main.py"
+            "src": "/$",
+            "dest": "frontend/build/index.html"
         }
     ]
 }
