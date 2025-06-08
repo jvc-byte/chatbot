@@ -30,11 +30,5 @@
       "src": "/",
       "dest": "frontend/build/index.html"
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "backend/app/main.py"
-    }
   ]
 }
