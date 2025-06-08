@@ -1,0 +1,102 @@
+{
+  "1747328391": {
+    "id": "1747328391",
+    "title": "Hello can you help me track my...",
+    "created_at": "2025-05-15T17:59:51.401114",
+    "updated_at": "2025-05-15T18:01:16.659237",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hello can you help me track my package on jumai?",
+        "timestamp": "2025-05-15T17:59:51.401148"
+      },
+      {
+        "role": "assistant",
+        "content": "Okay, I can definitely help you with that! To track your Jumia package, I'll need a little more information. Please provide me with one of the following:\n\n*   **Your Jumia Order Number:** This is the most reliable way to track your package. It's usually a long string of numbers and letters.\n*   **Your Jumia Email Address:** I can try to find your order using the email address you used when placing the order.\n*   **Your Jumia Mobile Number:**  Sometimes tracking is linked to the mobile number used for the order.\n\nOnce you give me one of these, I\u2019ll do my best to track your package and give you the latest updates.",
+        "timestamp": "2025-05-15T18:00:04.390414"
+      },
+      {
+        "role": "user",
+        "content": "Where is my order",
+        "timestamp": "2025-05-15T18:00:51.029206"
+      },
+      {
+        "role": "assistant",
+        "content": "Okay, I can help you with that! To look up your order, I'll need a little more information. Please tell me:\n\n*   **What store did you order from?** (e.g., Amazon, Target, Walmart, Etsy, a specific restaurant, etc.)\n*   **Do you have an order number?** (This is usually a string of numbers and letters.)\n*   **Or, can you provide the email address you used to place the order?** \n\nOnce I have that, I can track your order for you.",
+        "timestamp": "2025-05-15T18:00:54.024515"
+      }
+    ]
+  },
+  "1747328568": {
+    "id": "1747328568",
+    "title": "How are you today?",
+    "created_at": "2025-05-15T18:02:48.141347",
+    "updated_at": "2025-05-15T18:02:48.141386",
+    "messages": [
+      {
+        "role": "user",
+        "content": "How are you today?",
+        "timestamp": "2025-05-15T18:02:48.141379"
+      },
+      {
+        "role": "assistant",
+        "content": "I\u2019m doing well, thank you for asking! As an AI, I don\u2019t really *feel* in the same way humans do, but my systems are running smoothly and I\u2019m ready to help you with whatever you need. \ud83d\ude0a \n\nHow about you? How are *you* doing today?",
+        "timestamp": "2025-05-15T18:02:54.138457"
+      }
+    ]
+  },
+  "1748034556": {
+    "id": "1748034556",
+    "title": "hello",
+    "created_at": "2025-05-23T22:09:16.567602",
+    "updated_at": "2025-05-23T22:09:16.567618",
+    "messages": [
+      {
+        "role": "user",
+        "content": "hello",
+        "timestamp": "2025-05-23T22:09:16.567615"
+      },
+      {
+        "role": "assistant",
+        "content": "Hello there! How can I help you today? \ud83d\ude0a\n",
+        "timestamp": "2025-05-23T22:09:28.539930"
+      }
+    ]
+  },
+  "1748034577": {
+    "id": "1748034577",
+    "title": "hello",
+    "created_at": "2025-05-23T22:09:37.274815",
+    "updated_at": "2025-05-23T22:09:37.274841",
+    "messages": [
+      {
+        "role": "user",
+        "content": "hello",
+        "timestamp": "2025-05-23T22:09:37.274835"
+      },
+      {
+        "role": "assistant",
+        "content": "Hello there! How can I help you today? \ud83d\ude0a\n",
+        "timestamp": "2025-05-23T22:09:42.979436"
+      }
+    ]
+  },
+  "1749408817": {
+    "id": "1749408817",
+    "title": "hello",
+    "created_at": "2025-06-08T19:53:37.103930",
+    "updated_at": "2025-06-08T19:53:37.103978",
+    "messages": [
+      {
+        "role": "user",
+        "content": "hello",
+        "timestamp": "2025-06-08T19:53:37.103967"
+      },
+      {
+        "role": "assistant",
+        "content": "Hello there! How can I help you today? \ud83d\ude0a\n",
+        "timestamp": "2025-06-08T19:53:40.532366"
+      }
+    ]
+  }
+}
