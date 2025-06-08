@@ -60,6 +60,13 @@ interface Conversation {
   updated_at: string;
 }
 
+interface ChatResponse {
+  response: string;
+  conversation_id: string;
+  message_id?: string;
+  timestamp?: string;
+}
+
 const theme = extendTheme({
   styles: {
     global: {
@@ -345,27 +352,25 @@ const App: React.FC = () => {
         conversation_id: currentConversationId?.startsWith('temp-') ? null : currentConversationId,
       });
 
-      const response = await api.post<ChatResponse>('/api/chat', {
+      const response = await api.post('/api/chat', {
         message: message,
         conversation_id: currentConversationId?.startsWith('temp-') ? null : currentConversationId,
       });
 
       console.log('Received response:', response.data);
 
-      // The backend returns the message directly in the response.data
-      const responseData = response.data;
+      // The backend returns a ChatResponse object
+      const responseData = response.data as ChatResponse;
       
       // Ensure we have valid response data
-      if (!responseData) {
+      if (!responseData || !responseData.response) {
         throw new Error('Empty response from server');
       }
 
       // Create the assistant message
       const assistantMessage: Message = {
-        id: responseData.id || `msg-${Date.now()}`,
-        content: typeof responseData === 'string' 
-          ? responseData 
-          : responseData.content || responseData.response || JSON.stringify(responseData),
+        id: responseData.message_id || `msg-${Date.now()}`,
+        content: responseData.response,
         role: 'assistant',
         timestamp: responseData.timestamp || new Date().toISOString(),
       };
