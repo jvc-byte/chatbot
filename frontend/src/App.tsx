@@ -345,8 +345,8 @@ const App: React.FC = () => {
         conversation_id: currentConversationId?.startsWith('temp-') ? null : currentConversationId,
       });
 
-      const response = await api.post('/api/chat', {
-        message,
+      const response = await api.post<ChatResponse>('/api/chat', {
+        message: message,
         conversation_id: currentConversationId?.startsWith('temp-') ? null : currentConversationId,
       });
 
