@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "backend/app/main.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "maxDuration": 30
+      }
     },
     {
       "src": "frontend/package.json",
@@ -13,7 +16,8 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/app/main.py"
+      "dest": "backend/app/main.py",
+      "continue": true
     },
     {
       "src": "/(.*\\.(js|css|png|jpg|svg|html))",
@@ -22,6 +26,12 @@
     {
       "src": "/",
       "dest": "/index.html"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "backend/app/main.py"
     }
   ]
 }
