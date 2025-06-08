@@ -173,6 +173,39 @@ const App: React.FC = () => {
     }
   }, [toast]);
 
+  // Load messages for a conversation
+  const fetchConversationMessages = useCallback(async (conversationId: string) => {
+    console.log('Fetching messages for conversation:', conversationId);
+    try {
+      const response = await api.get(`/api/conversations/${conversationId}/messages`);
+      console.log('Response:', response.data);
+      setMessages(response.data);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+        });
+      }
+      toast({
+        title: 'Error',
+        description: 'Failed to load messages. Check console for details.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [toast]);
+
+  // Load messages when conversation changes
+  useEffect(() => {
+    if (currentConversationId) {
+      fetchConversationMessages(currentConversationId);
+    }
+  }, [currentConversationId, fetchConversationMessages]);
+
   // Generate a temporary ID for new conversations until saved to the backend
   const generateTempId = () => `temp-${Date.now()}`;
 
@@ -185,16 +218,6 @@ const App: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Fetch conversations when component mounts
-  useEffect(() => {
-    fetchConversations();
-  }, [fetchConversations]);
-
-  // Handle conversation selection
-  const handleConversationSelect = (conversationId: string) => {
-    setCurrentConversationId(conversationId);
-    fetchConversationMessages(conversationId);
-  };
 
   // Load messages when conversation changes
   const fetchMessages = useCallback(async (conversationId: string) => {
