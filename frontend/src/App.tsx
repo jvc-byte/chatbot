@@ -149,18 +149,6 @@ const App: React.FC = () => {
   const toast = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Generate a temporary ID for new conversations until saved to the backend
-  const generateTempId = () => `temp-${Date.now()}`;
-
-  // Auto-scroll to bottom of messages
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   // Load conversations from the backend
   const fetchConversations = useCallback(async () => {
     try {
@@ -185,9 +173,28 @@ const App: React.FC = () => {
     }
   }, [toast]);
 
+  // Generate a temporary ID for new conversations until saved to the backend
+  const generateTempId = () => `temp-${Date.now()}`;
+
+  // Auto-scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Fetch conversations when component mounts
   useEffect(() => {
     fetchConversations();
   }, [fetchConversations]);
+
+  // Handle conversation selection
+  const handleConversationSelect = (conversationId: string) => {
+    setCurrentConversationId(conversationId);
+    fetchConversationMessages(conversationId);
+  };
 
   // Load messages when conversation changes
   const fetchMessages = useCallback(async (conversationId: string) => {
