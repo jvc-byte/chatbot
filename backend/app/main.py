@@ -26,13 +26,42 @@ app = FastAPI()
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Only allow frontend origin
+    allow_origins=["*"],  # Allow all origins for Vercel deployment
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
     max_age=600,  # Cache preflight requests for 10 minutes
 )
+
+# Global conversations storage
+conversations = {}
+
+@app.get("/api/conversations")
+async def get_conversations():
+    """Get list of all conversations"""
+    return [
+        {
+            "id": conv_id,
+            "title": conv.get('title', f"Conversation {conv_id}")[:50],
+            "updated_at": conv.get('updated_at', datetime.now().isoformat())
+        }
+        for conv_id, conv in conversations.items()
+    ]
+
+@app.get("/api/conversations/{conversation_id}/messages")
+async def get_conversation_messages(conversation_id: str):
+    if conversation_id not in conversations:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    
+    # Convert messages to a list of dictionaries
+    messages = conversations[conversation_id].get('messages', [])
+    return [{
+        'id': str(i),
+        'content': msg['content'],
+        'role': msg['role'],
+        'timestamp': msg['timestamp']
+    } for i, msg in enumerate(messages)]
 
 class Message(BaseModel):
     role: str  # 'user' or 'assistant'
