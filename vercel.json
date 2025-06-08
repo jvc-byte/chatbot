@@ -1,34 +1,37 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "backend/app/main.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxDuration": 30
-      }
-    },
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "frontend/build"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "backend/app/main.py",
-      "continue": true
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|svg|html))",
-      "dest": "frontend/build/$1"
-    },
-    {
-      "src": "/",
-      "dest": "frontend/build/index.html"
-    }
-  ]
+    "version": 2,
+    "builds": [
+        {
+            "src": "backend/app/main.py",
+            "use": "@vercel/python",
+            "config": {
+                "maxDuration": 30
+            }
+        },
+        {
+            "src": "frontend/package.json",
+            "use": "@vercel/static-build"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "backend/app/main.py",
+            "continue": true
+        },
+        {
+            "src": "/(.*\\.(js|css|png|jpg|svg|html))",
+            "dest": "/$1"
+        },
+        {
+            "src": "/",
+            "dest": "/index.html"
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "backend/app/main.py"
+        }
+    ]
 }
