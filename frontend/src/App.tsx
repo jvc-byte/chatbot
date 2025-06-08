@@ -6,7 +6,7 @@ import axios from 'axios';
 
 // Configure axios defaults
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: '', // Use relative paths for Vercel deployment
   timeout: 10000, // 10 seconds
   headers: {
     'Content-Type': 'application/json',
