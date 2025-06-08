@@ -21,21 +21,81 @@ genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 # Initialize the model
 model = genai.GenerativeModel(model_name='models/gemma-3-4b-it')
 
+from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+import google.generativeai as genai
+from dotenv import load_dotenv
+from typing import Dict, List, Optional, Any
+import os
+import json
+from datetime import datetime
+from pathlib import Path
+import traceback
+
+# Load environment variables
+load_dotenv()
+
+# Configure Google Gemini API
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+
+# Initialize the model
+model = genai.GenerativeModel(model_name='models/gemma-3-4b-it')
+
+# Initialize FastAPI app
 app = FastAPI()
 
-# Configure CORS
+# Configure CORS for Vercel deployment
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for Vercel deployment
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"],
-    max_age=600,  # Cache preflight requests for 10 minutes
+    max_age=600,
 )
 
 # Global conversations storage
 conversations = {}
+
+# File to store conversations
+CHAT_HISTORY_FILE = Path("chat_history.json")
+
+# Initialize chat history file if it doesn't exist
+if not CHAT_HISTORY_FILE.exists():
+    CHAT_HISTORY_FILE.write_text("{}")
+
+# Load conversations from file
+def load_conversations() -> Dict[str, dict]:
+    try:
+        return json.loads(CHAT_HISTORY_FILE.read_text())
+    except json.JSONDecodeError:
+        return {}
+
+def save_conversations(conversations: Dict[str, dict]):
+    CHAT_HISTORY_FILE.write_text(json.dumps(conversations, indent=2))
+
+# Load existing conversations
+conversations = load_conversations()
+
+# Exception handler for 500 errors
+@app.exception_handler(Exception)
+async def validation_exception_handler(request: Request, exc: Exception):
+    print(f"Error: {str(exc)}")
+    print(traceback.format_exc())
+    
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal server error"},
+        headers={"Access-Control-Allow-Origin": "*"}
+    )
+
+# Handle preflight requests
+@app.options("/api/{path:path}")
+async def preflight_handler(request: Request):
+    return JSONResponse(status_code=200)
 
 @app.get("/api/conversations")
 async def get_conversations():
@@ -62,6 +122,92 @@ async def get_conversation_messages(conversation_id: str):
         'role': msg['role'],
         'timestamp': msg['timestamp']
     } for i, msg in enumerate(messages)]
+
+# Chat endpoint
+@app.post("/api/chat")
+async def chat(request: Request):
+    try:
+        # Get request body
+        body = await request.json()
+        
+        # Validate input
+        if not body.get('message') or not body['message'].strip():
+            raise HTTPException(status_code=400, detail="Message cannot be empty")
+        
+        # Get conversation ID
+        conversation_id = body.get('conversation_id')
+        
+        # Check if we're continuing an existing conversation
+        if conversation_id and conversation_id in conversations:
+            conversation = conversations[conversation_id]
+            # Ensure messages list exists
+            if 'messages' not in conversation:
+                conversation['messages'] = []
+        else:
+            # Start a new conversation
+            conversation_id = str(int(datetime.now().timestamp()))
+            conversation = {
+                "id": conversation_id,
+                "title": body['message'][:30] + ("..." if len(body['message']) > 30 else ""),
+                "created_at": datetime.now().isoformat(),
+                "updated_at": datetime.now().isoformat(),
+                "messages": []
+            }
+            conversations[conversation_id] = conversation
+        
+        # Add user message to conversation
+        user_message = {
+            "role": "user",
+            "content": body['message'],
+            "timestamp": datetime.now().isoformat()
+        }
+        conversation["messages"].append(user_message)
+        conversation["updated_at"] = datetime.now().isoformat()
+        
+        # Generate response using Gemini
+        try:
+            response = model.generate_content(
+                body['message'],
+                temperature=0.7,
+                top_p=0.8,
+                top_k=40,
+                max_output_tokens=2048
+            )
+            
+            # Get the response text
+            response_text = response.text
+            
+            # Add assistant message to conversation
+            assistant_message = {
+                "role": "assistant",
+                "content": response_text,
+                "timestamp": datetime.now().isoformat()
+            }
+            conversation["messages"].append(assistant_message)
+            
+            # Save conversations
+            save_conversations(conversations)
+            
+            return {
+                "response": response_text,
+                "conversation_id": conversation_id,
+                "message_id": str(len(conversation["messages"]) - 1),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            print(f"Error generating response: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to generate response"
+            )
+            
+    except Exception as e:
+        print(f"Error processing request: {str(e)}")
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
 
 class Message(BaseModel):
     role: str  # 'user' or 'assistant'
